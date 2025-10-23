@@ -2,6 +2,7 @@
 #define HEAP_H
 #include <functional>
 #include <stdexcept>
+#include <vector> //guide permits vector<T>
 
 template <typename T, typename PComparator = std::less<T> >
 class Heap
@@ -61,13 +62,30 @@ public:
 
 private:
   /// Add whatever helper functions and data members you need below
-
-
-
-
+  int m_;
+  PComparator c_;
+  std::vector<T> data_;
 };
 
 // Add implementation of member functions here
+template <typename T, typename PComparator>
+Heap<T, PComparator>::Heap(int m, PComparator c){
+  m_ = m;
+  c_ = c;
+}
+
+template <typename T, typename PComparator>
+Heap<T, PComparator>::~Heap(){}
+
+template <typename T, typename PComparator>
+bool Heap<T, PComparator>::empty()const{
+  return data_.empty();
+}
+
+template <typename T, typename PComparator>
+size_t Heap<T, PComparator>::size()const{
+  return data_.size();
+}
 
 
 // We will start top() for you to handle the case of 
@@ -81,13 +99,12 @@ T const & Heap<T,PComparator>::top() const
     // ================================
     // throw the appropriate exception
     // ================================
-
+    throw std::underflow_error("Heap Underflow, no top element");
 
   }
   // If we get here we know the heap has at least 1 item
   // Add code to return the top element
-
-
+  return data_.front();
 
 }
 
@@ -101,15 +118,54 @@ void Heap<T,PComparator>::pop()
     // ================================
     // throw the appropriate exception
     // ================================
-
+    throw std::underflow_error("Heap Underflow, no element to pop");
 
   }
 
+  data_[0] = data_.back();
+  data_.pop_back();
+  size_t top = 0;
+  //swtiches multiple times
+  while(true){
+    //check if there is no children
+    
+    size_t newt = top;
 
-
+    //1 switch
+    for(int i=1; i<=m_; ++i){
+      //find node that needs to be at root
+      size_t walk = m_ * top + i;
+      if(walk<data_.size()){
+        if(c_(data_[walk], data_[newt])){
+          newt = walk;
+        }
+      }
+    }
+    if(newt == top){
+      break;
+    }
+    std::swap(data_[top], data_[newt]);
+    top = newt;
+  }
 }
 
+template <typename T, typename PComparator>
+void Heap<T, PComparator>::push(const T& item){
+  data_.push_back(item);
+  int sze = data_.size()-1;
 
+  while(sze > 0 ){
+    int p = (sze - 1)/m_;
+    if(c_(data_[sze], data_[p])){
+      std::swap(data_[sze], data_[p]);
+      sze = p;
+    }
+    else{
+      break;
+    }
+  }
+  return;
+}
 
 #endif
 

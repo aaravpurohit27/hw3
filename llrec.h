@@ -83,7 +83,20 @@ Node* llfilter(Node* head, Comp pred)
     //*********************************************
     // Provide your implementation below
     //*********************************************
+  if(head==nullptr){
+    return nullptr;
+  }
 
+
+  Node* walk = llfilter(head->next, pred);//goes to end first
+  if(pred(head->val)==true){ // if last node doesn;t belong
+    delete head;
+    return walk;
+  }
+  else{
+    head->next = walk;
+    return head;
+  }
 
 }
 
